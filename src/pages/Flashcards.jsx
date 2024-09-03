@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import { toast } from "sonner";
 
 const Flashcards = () => {
   const [flashcards, setFlashcards] = useState([]);
@@ -21,17 +22,34 @@ const Flashcards = () => {
   };
 
   const handleGenerateFlashcards = () => {
-    if (!uploadedFile) return;
+    if (!uploadedFile) {
+      toast.error("Please upload a CSV file first.");
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = (e) => {
       const content = e.target.result;
       const lines = content.split('\n');
-      const cards = lines.map(line => {
-        const [question, answer] = line.split(',');
-        return { question: question.trim(), answer: answer.trim() };
-      });
+      const cards = lines
+        .filter(line => line.trim() !== '')
+        .map(line => {
+          const [question, answer] = line.split(',').map(item => item.trim());
+          if (!question || !answer) {
+            toast.error(`Invalid line in CSV: ${line}`);
+            return null;
+          }
+          return { question, answer };
+        })
+        .filter(card => card !== null);
+
+      if (cards.length === 0) {
+        toast.error("No valid flashcards found in the CSV file.");
+        return;
+      }
+
       setFlashcards(cards);
+      toast.success(`Generated ${cards.length} flashcards.`);
     };
     reader.readAsText(uploadedFile);
   };
