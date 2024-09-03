@@ -39,12 +39,15 @@ const Flashcards = () => {
       const cards = lines
         .filter(line => line.trim() !== '')
         .map((line, index) => {
-          const [question, answer] = line.split(',').map(item => item?.trim());
+          // Split the line only at the first comma
+          const [question, ...answerParts] = line.split(',');
+          const answer = answerParts.join(',').trim();
+          
           if (!question || !answer) {
             toast.error(`Invalid line in CSV: ${line}`);
             return null;
           }
-          return { id: index, question, answer, isDifficult: false };
+          return { id: index, question: question.trim(), answer, isDifficult: false };
         })
         .filter(card => card !== null);
 
