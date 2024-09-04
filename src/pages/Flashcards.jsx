@@ -6,113 +6,19 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import FlashcardTable from '../components/FlashcardTable';
 import FlashcardStudy from '../components/FlashcardStudy';
+import Instructions from '../components/Instructions';
+import { useFlashcards } from '../hooks/useFlashcards';
+import { useFileUpload } from '../hooks/useFileUpload';
 
 const Flashcards = () => {
-  const [flashcards, setFlashcards] = useState([]);
-  const [currentCardIndex, setCurrentCardIndex] = useState(0);
-  const [cardsPerSet, setCardsPerSet] = useState(10);
-  const [showAnswer, setShowAnswer] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState([]);
-  const [selectedFile, setSelectedFile] = useState(null);
   const [showTable, setShowTable] = useState(false);
   const [reviewingDifficult, setReviewingDifficult] = useState(false);
-  const [randomize, setRandomize] = useState(false);
+  const { flashcards, setFlashcards, currentCardIndex, setCurrentCardIndex, cardsPerSet, setCardsPerSet, randomize, setRandomize, handleGenerateFlashcards, toggleDifficult, getCurrentCard } = useFlashcards();
+  const { uploadedFiles, selectedFile, setSelectedFile, handleFileUpload, handleFileSelect } = useFileUpload();
 
   useEffect(() => {
     document.documentElement.classList.add('dark');
   }, []);
-
-  const handleFileUpload = (event) => {
-    const files = Array.from(event.target.files);
-    setUploadedFiles(prevFiles => [...prevFiles, ...files]);
-  };
-
-  const handleGenerateFlashcards = () => {
-    if (!selectedFile) {
-      toast.error("Please select a file to study.");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const content = e.target.result;
-      const lines = content.split('\n');
-      let cards = lines
-        .filter(line => line.trim() !== '')
-        .map((line, index) => {
-          const [question, ...answerParts] = line.split(',');
-          const answer = answerParts.join(',').trim();
-          
-          if (!question || !answer) {
-            toast.error(`Invalid line in CSV: ${line}`);
-            return null;
-          }
-          return { id: index, question: question.trim(), answer, isDifficult: false };
-        })
-        .filter(card => card !== null);
-
-      if (cards.length === 0) {
-        toast.error("No valid flashcards found in the CSV file.");
-        return;
-      }
-
-      if (randomize) {
-        cards = shuffleArray(cards);
-      }
-
-      cards = cards.slice(0, cardsPerSet);
-
-      setFlashcards(cards);
-      setCurrentCardIndex(0);
-      setReviewingDifficult(false);
-      toast.success(`Generated ${cards.length} flashcards.`);
-    };
-    reader.readAsText(selectedFile);
-  };
-
-  const shuffleArray = (array) => {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-  };
-
-  const handleCardsPerSetChange = (event) => {
-    setCardsPerSet(parseInt(event.target.value, 10));
-  };
-
-  const handleNextCard = () => {
-    const currentSet = reviewingDifficult ? flashcards.filter(card => card.isDifficult) : flashcards;
-    if (currentSet.length === 0) {
-      toast.error("No cards to review.");
-      return;
-    }
-    setCurrentCardIndex((prevIndex) => (prevIndex + 1) % currentSet.length);
-    setShowAnswer(false);
-  };
-
-  const handlePrevCard = () => {
-    const currentSet = reviewingDifficult ? flashcards.filter(card => card.isDifficult) : flashcards;
-    if (currentSet.length === 0) {
-      toast.error("No cards to review.");
-      return;
-    }
-    setCurrentCardIndex((prevIndex) => (prevIndex - 1 + currentSet.length) % currentSet.length);
-    setShowAnswer(false);
-  };
-
-  const toggleAnswer = () => setShowAnswer(!showAnswer);
-
-  const toggleDifficult = () => {
-    setFlashcards(cards =>
-      cards.map((card, index) =>
-        index === currentCardIndex ? { ...card, isDifficult: !card.isDifficult } : card
-      )
-    );
-  };
-
-  const handleFileSelect = (file) => setSelectedFile(file);
 
   const toggleTableView = () => setShowTable(!showTable);
 
@@ -124,17 +30,14 @@ const Flashcards = () => {
     }
     setReviewingDifficult(!reviewingDifficult);
     setCurrentCardIndex(0);
-    setShowAnswer(false);
-  };
-
-  const getCurrentCard = () => {
-    const currentSet = reviewingDifficult ? flashcards.filter(card => card.isDifficult) : flashcards;
-    return currentSet[currentCardIndex] || null;
   };
 
   return (
     <div className="container mx-auto p-4 min-h-screen bg-gray-900 text-white">
-      <h1 className="text-3xl font-bold mb-6">Flashcard App</h1>
+      <header className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Endeavor Flash Cards Creator</h1>
+        <Instructions />
+      </header>
       <div className="mb-6 space-y-4">
         <div>
           <Input type="file" accept=".csv" onChange={handleFileUpload} multiple className="mb-2 bg-gray-800 text-white" />
@@ -158,7 +61,7 @@ const Flashcards = () => {
               id="cardsPerSet"
               type="number"
               value={cardsPerSet}
-              onChange={handleCardsPerSetChange}
+              onChange={(e) => setCardsPerSet(parseInt(e.target.value, 10))}
               min="1"
               className="w-20 bg-gray-800 text-white"
             />
@@ -189,11 +92,7 @@ const Flashcards = () => {
           ) : (
             <FlashcardStudy
               currentCard={getCurrentCard()}
-              showAnswer={showAnswer}
-              toggleAnswer={toggleAnswer}
               toggleDifficult={toggleDifficult}
-              handlePrevCard={handlePrevCard}
-              handleNextCard={handleNextCard}
               currentIndex={currentCardIndex}
               totalCards={reviewingDifficult ? flashcards.filter(card => card.isDifficult).length : flashcards.length}
               reviewingDifficult={reviewingDifficult}
