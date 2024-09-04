@@ -61,12 +61,12 @@ const Flashcards = () => {
   return (
     <div className="container mx-auto p-4 min-h-screen bg-gray-900 text-white">
       <header className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Endeavor Flash Cards Creator</h1>
+        <h1 className="text-3xl font-bold">Flash Card Creator</h1>
         <Instructions />
       </header>
       <div className="mb-6 space-y-4">
         <div>
-          <Input type="file" accept=".csv" onChange={handleFileUpload} multiple className="mb-2 bg-gray-800 text-white" />
+          <Input type="file" accept=".csv" onChange={handleFileUpload} multiple className="mb-2 bg-gray-800 text-gray-300" />
           <div className="flex flex-wrap gap-2 mt-2">
             {uploadedFiles.map((file, index) => (
               <Button
