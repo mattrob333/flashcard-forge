@@ -66,7 +66,13 @@ const Flashcards = () => {
       </header>
       <div className="mb-6 space-y-4">
         <div>
-          <Input type="file" accept=".csv" onChange={handleFileUpload} multiple className="mb-2 bg-gray-800 text-gray-300" />
+          <Input 
+            type="file" 
+            accept=".csv" 
+            onChange={handleFileUpload} 
+            multiple 
+            className="mb-2 bg-gray-800 text-gray-300 file:text-gray-100" 
+          />
           <div className="flex flex-wrap gap-2 mt-2">
             {uploadedFiles.map((file, index) => (
               <Button
