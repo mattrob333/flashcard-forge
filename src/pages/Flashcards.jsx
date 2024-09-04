@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { toast } from "sonner";
+import FlashcardTable from '../components/FlashcardTable';
+import FlashcardStudy from '../components/FlashcardStudy';
 
 const Flashcards = () => {
   const [flashcards, setFlashcards] = useState([]);
@@ -39,7 +37,6 @@ const Flashcards = () => {
       const cards = lines
         .filter(line => line.trim() !== '')
         .map((line, index) => {
-          // Split the line only at the first comma
           const [question, ...answerParts] = line.split(',');
           const answer = answerParts.join(',').trim();
           
@@ -69,34 +66,26 @@ const Flashcards = () => {
   };
 
   const handleNextCard = () => {
-    const difficultCards = flashcards.filter(card => card.isDifficult);
-    const currentSet = reviewingDifficult ? difficultCards : flashcards;
-    
+    const currentSet = reviewingDifficult ? flashcards.filter(card => card.isDifficult) : flashcards;
     if (currentSet.length === 0) {
       toast.error("No cards to review.");
       return;
     }
-    
     setCurrentCardIndex((prevIndex) => (prevIndex + 1) % currentSet.length);
     setShowAnswer(false);
   };
 
   const handlePrevCard = () => {
-    const difficultCards = flashcards.filter(card => card.isDifficult);
-    const currentSet = reviewingDifficult ? difficultCards : flashcards;
-    
+    const currentSet = reviewingDifficult ? flashcards.filter(card => card.isDifficult) : flashcards;
     if (currentSet.length === 0) {
       toast.error("No cards to review.");
       return;
     }
-    
     setCurrentCardIndex((prevIndex) => (prevIndex - 1 + currentSet.length) % currentSet.length);
     setShowAnswer(false);
   };
 
-  const toggleAnswer = () => {
-    setShowAnswer(!showAnswer);
-  };
+  const toggleAnswer = () => setShowAnswer(!showAnswer);
 
   const toggleDifficult = () => {
     setFlashcards(cards =>
@@ -106,13 +95,9 @@ const Flashcards = () => {
     );
   };
 
-  const handleFileSelect = (file) => {
-    setSelectedFile(file);
-  };
+  const handleFileSelect = (file) => setSelectedFile(file);
 
-  const toggleTableView = () => {
-    setShowTable(!showTable);
-  };
+  const toggleTableView = () => setShowTable(!showTable);
 
   const toggleReviewDifficult = () => {
     const difficultCards = flashcards.filter(card => card.isDifficult);
@@ -126,8 +111,7 @@ const Flashcards = () => {
   };
 
   const getCurrentCard = () => {
-    const difficultCards = flashcards.filter(card => card.isDifficult);
-    const currentSet = reviewingDifficult ? difficultCards : flashcards;
+    const currentSet = reviewingDifficult ? flashcards.filter(card => card.isDifficult) : flashcards;
     return currentSet[currentCardIndex] || null;
   };
 
@@ -173,83 +157,19 @@ const Flashcards = () => {
             </Button>
           </div>
           {showTable ? (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Question</TableHead>
-                    <TableHead>Answer</TableHead>
-                    <TableHead>Difficult</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {flashcards.map((card, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{card.question}</TableCell>
-                      <TableCell>{card.answer}</TableCell>
-                      <TableCell>
-                        <Checkbox
-                          checked={card.isDifficult}
-                          onCheckedChange={() => {
-                            setFlashcards(cards =>
-                              cards.map((c, i) =>
-                                i === index ? { ...c, isDifficult: !c.isDifficult } : c
-                              )
-                            );
-                          }}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+            <FlashcardTable flashcards={flashcards} setFlashcards={setFlashcards} />
           ) : (
-            <div className="mt-8">
-              <Card className="w-full max-w-md mx-auto p-6 bg-gray-800 text-white">
-                <div className="text-center mb-4">
-                  <span className="text-sm text-gray-400">
-                    {reviewingDifficult ? "Reviewing Difficult Cards" : "All Cards"}
-                  </span>
-                  <br />
-                  <span className="text-sm text-gray-400">
-                    Card {currentCardIndex + 1} of {reviewingDifficult ? flashcards.filter(card => card.isDifficult).length : flashcards.length}
-                  </span>
-                </div>
-                <div className="min-h-[200px] flex items-center justify-center">
-                  {getCurrentCard() ? (
-                    showAnswer ? (
-                      <p className="text-xl">{getCurrentCard().answer}</p>
-                    ) : (
-                      <p className="text-xl">{getCurrentCard().question}</p>
-                    )
-                  ) : (
-                    <p className="text-xl">No cards available</p>
-                  )}
-                </div>
-                <Button onClick={toggleAnswer} className="w-full mt-4">
-                  {showAnswer ? 'Show Question' : 'Show Answer'}
-                </Button>
-                <div className="flex items-center justify-between mt-4">
-                  <Button onClick={handlePrevCard} variant="outline" className="border-gray-600">
-                    <ChevronLeftIcon className="h-4 w-4 mr-2" />
-                    Previous
-                  </Button>
-                  <div className="flex items-center">
-                    <Checkbox
-                      id="difficultCard"
-                      checked={getCurrentCard()?.isDifficult || false}
-                      onCheckedChange={toggleDifficult}
-                    />
-                    <label htmlFor="difficultCard" className="ml-2 text-sm">Mark as difficult</label>
-                  </div>
-                  <Button onClick={handleNextCard} variant="outline" className="border-gray-600">
-                    Next
-                    <ChevronRightIcon className="h-4 w-4 ml-2" />
-                  </Button>
-                </div>
-              </Card>
-            </div>
+            <FlashcardStudy
+              currentCard={getCurrentCard()}
+              showAnswer={showAnswer}
+              toggleAnswer={toggleAnswer}
+              toggleDifficult={toggleDifficult}
+              handlePrevCard={handlePrevCard}
+              handleNextCard={handleNextCard}
+              currentIndex={currentCardIndex}
+              totalCards={reviewingDifficult ? flashcards.filter(card => card.isDifficult).length : flashcards.length}
+              reviewingDifficult={reviewingDifficult}
+            />
           )}
         </>
       )}
