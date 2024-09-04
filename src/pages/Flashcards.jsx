@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import FlashcardTable from '../components/FlashcardTable';
 import FlashcardStudy from '../components/FlashcardStudy';
@@ -14,6 +16,7 @@ const Flashcards = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [showTable, setShowTable] = useState(false);
   const [reviewingDifficult, setReviewingDifficult] = useState(false);
+  const [randomize, setRandomize] = useState(false);
 
   useEffect(() => {
     document.documentElement.classList.add('dark');
@@ -34,7 +37,7 @@ const Flashcards = () => {
     reader.onload = (e) => {
       const content = e.target.result;
       const lines = content.split('\n');
-      const cards = lines
+      let cards = lines
         .filter(line => line.trim() !== '')
         .map((line, index) => {
           const [question, ...answerParts] = line.split(',');
@@ -53,12 +56,26 @@ const Flashcards = () => {
         return;
       }
 
+      if (randomize) {
+        cards = shuffleArray(cards);
+      }
+
+      cards = cards.slice(0, cardsPerSet);
+
       setFlashcards(cards);
       setCurrentCardIndex(0);
       setReviewingDifficult(false);
       toast.success(`Generated ${cards.length} flashcards.`);
     };
     reader.readAsText(selectedFile);
+  };
+
+  const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
   };
 
   const handleCardsPerSetChange = (event) => {
@@ -133,18 +150,29 @@ const Flashcards = () => {
               </Button>
             ))}
           </div>
-          <Button onClick={handleGenerateFlashcards} className="w-full mt-2">Generate Flashcards</Button>
         </div>
-        <div className="flex items-center space-x-2">
-          <Input
-            type="number"
-            value={cardsPerSet}
-            onChange={handleCardsPerSetChange}
-            min="1"
-            className="w-20 bg-gray-800 text-white"
-          />
-          <span>Cards per set</span>
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <Label htmlFor="cardsPerSet">Cards per set:</Label>
+            <Input
+              id="cardsPerSet"
+              type="number"
+              value={cardsPerSet}
+              onChange={handleCardsPerSetChange}
+              min="1"
+              className="w-20 bg-gray-800 text-white"
+            />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Label htmlFor="randomize">Randomize:</Label>
+            <Switch
+              id="randomize"
+              checked={randomize}
+              onCheckedChange={setRandomize}
+            />
+          </div>
         </div>
+        <Button onClick={handleGenerateFlashcards} className="w-full">Generate Flashcards</Button>
       </div>
       {flashcards.length > 0 && (
         <>
