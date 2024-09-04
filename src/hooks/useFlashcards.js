@@ -16,8 +16,8 @@ export const useFlashcards = () => {
   };
 
   const handleGenerateFlashcards = (selectedFile) => {
-    if (!selectedFile) {
-      toast.error("Please select a file to study.");
+    if (!selectedFile || !(selectedFile instanceof File)) {
+      toast.error("Please select a valid file to study.");
       return;
     }
 
