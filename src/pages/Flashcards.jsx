@@ -13,6 +13,7 @@ import { useFileUpload } from '../hooks/useFileUpload';
 const Flashcards = () => {
   const [showTable, setShowTable] = useState(false);
   const [reviewingDifficult, setReviewingDifficult] = useState(false);
+  const [showAnswer, setShowAnswer] = useState(false);
   const { flashcards, setFlashcards, currentCardIndex, setCurrentCardIndex, cardsPerSet, setCardsPerSet, randomize, setRandomize, handleGenerateFlashcards, toggleDifficult, getCurrentCard } = useFlashcards();
   const { uploadedFiles, selectedFile, setSelectedFile, handleFileUpload, handleFileSelect } = useFileUpload();
 
@@ -30,6 +31,7 @@ const Flashcards = () => {
     }
     setReviewingDifficult(!reviewingDifficult);
     setCurrentCardIndex(0);
+    setShowAnswer(false);
   };
 
   const handleGenerateClick = () => {
@@ -38,6 +40,22 @@ const Flashcards = () => {
     } else {
       toast.error("Please select a file before generating flashcards.");
     }
+  };
+
+  const handleNextCard = () => {
+    const cards = reviewingDifficult ? flashcards.filter(card => card.isDifficult) : flashcards;
+    setCurrentCardIndex((prevIndex) => (prevIndex + 1) % cards.length);
+    setShowAnswer(false);
+  };
+
+  const handlePrevCard = () => {
+    const cards = reviewingDifficult ? flashcards.filter(card => card.isDifficult) : flashcards;
+    setCurrentCardIndex((prevIndex) => (prevIndex - 1 + cards.length) % cards.length);
+    setShowAnswer(false);
+  };
+
+  const toggleAnswer = () => {
+    setShowAnswer(!showAnswer);
   };
 
   return (
@@ -100,7 +118,11 @@ const Flashcards = () => {
           ) : (
             <FlashcardStudy
               currentCard={getCurrentCard()}
+              showAnswer={showAnswer}
+              toggleAnswer={toggleAnswer}
               toggleDifficult={toggleDifficult}
+              handlePrevCard={handlePrevCard}
+              handleNextCard={handleNextCard}
               currentIndex={currentCardIndex}
               totalCards={reviewingDifficult ? flashcards.filter(card => card.isDifficult).length : flashcards.length}
               reviewingDifficult={reviewingDifficult}
