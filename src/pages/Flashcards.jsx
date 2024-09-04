@@ -32,6 +32,14 @@ const Flashcards = () => {
     setCurrentCardIndex(0);
   };
 
+  const handleGenerateClick = () => {
+    if (selectedFile) {
+      handleGenerateFlashcards(selectedFile);
+    } else {
+      toast.error("Please select a file before generating flashcards.");
+    }
+  };
+
   return (
     <div className="container mx-auto p-4 min-h-screen bg-gray-900 text-white">
       <header className="flex justify-between items-center mb-6">
@@ -75,7 +83,7 @@ const Flashcards = () => {
             />
           </div>
         </div>
-        <Button onClick={handleGenerateFlashcards} className="w-full">Generate Flashcards</Button>
+        <Button onClick={handleGenerateClick} className="w-full">Generate Flashcards</Button>
       </div>
       {flashcards.length > 0 && (
         <>

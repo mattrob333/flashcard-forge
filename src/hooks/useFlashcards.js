@@ -32,7 +32,7 @@ export const useFlashcards = () => {
           const answer = answerParts.join(',').trim();
           
           if (!question || !answer) {
-            toast.error(`Invalid line in CSV: ${line}`);
+            console.warn(`Invalid line in CSV: ${line}`);
             return null;
           }
           return { id: index, question: question.trim(), answer, isDifficult: false };
