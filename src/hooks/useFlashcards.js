@@ -54,6 +54,9 @@ export const useFlashcards = () => {
       setCurrentCardIndex(0);
       toast.success(`Generated ${cards.length} flashcards.`);
     };
+    reader.onerror = (error) => {
+      toast.error("Error reading file: " + error);
+    };
     reader.readAsText(selectedFile);
   };
 
