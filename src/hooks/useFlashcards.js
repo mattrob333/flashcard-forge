@@ -29,7 +29,9 @@ export const useFlashcards = () => {
       let cards = lines
         .filter(line => line.trim() !== '')
         .map((line, index) => {
-          const [question, answer, isMissed] = line.split(',').map(item => item.trim());
+          // Split the line only at the first comma to preserve the rest of the content
+          const [question, ...answerParts] = line.split(',');
+          const answer = answerParts.join(',').trim();
           
           if (!question || !answer) {
             console.warn(`Invalid line in CSV: ${line}`);
@@ -37,9 +39,9 @@ export const useFlashcards = () => {
           }
           return { 
             id: index, 
-            question, 
+            question: question.trim(), 
             answer, 
-            isMissed: isMissed === 'true'
+            isMissed: false
           };
         })
         .filter(card => card !== null);
