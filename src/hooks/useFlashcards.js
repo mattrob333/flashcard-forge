@@ -29,9 +29,13 @@ export const useFlashcards = () => {
       let cards = lines
         .filter(line => line.trim() !== '')
         .map((line, index) => {
-          // Split the line only at the first comma to preserve the rest of the content
-          const [question, ...answerParts] = line.split(',');
-          const answer = answerParts.join(',').trim();
+          const lastCommaIndex = line.lastIndexOf(',');
+          if (lastCommaIndex === -1) {
+            console.warn(`Invalid line in CSV: ${line}`);
+            return null;
+          }
+          const question = line.slice(0, lastCommaIndex).trim();
+          const answer = line.slice(lastCommaIndex + 1).trim();
           
           if (!question || !answer) {
             console.warn(`Invalid line in CSV: ${line}`);
@@ -39,7 +43,7 @@ export const useFlashcards = () => {
           }
           return { 
             id: index, 
-            question: question.trim(), 
+            question, 
             answer, 
             isMissed: false
           };
