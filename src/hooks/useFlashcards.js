@@ -29,14 +29,7 @@ export const useFlashcards = () => {
       let cards = lines
         .filter(line => line.trim() !== '')
         .map((line, index) => {
-          const parts = line.split(',');
-          if (parts.length < 2) {
-            console.warn(`Invalid line in CSV: ${line}`);
-            return null;
-          }
-          const question = parts[0].trim();
-          const answer = parts.slice(1).join(',').trim();
-          
+          const [question, answer] = line.split(',').map(part => part.trim());
           if (!question || !answer) {
             console.warn(`Invalid line in CSV: ${line}`);
             return null;
