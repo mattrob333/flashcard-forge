@@ -29,7 +29,7 @@ const Flashcards = () => {
     handlePrevCard,
     toggleReviewMissed
   } = useFlashcards();
-  const { uploadedFiles, selectedFile, setSelectedFile, handleFileUpload, handleFileSelect } = useFileUpload();
+  const { uploadedFiles, selectedFile, questionCount, setSelectedFile, handleFileUpload, handleFileSelect } = useFileUpload();
 
   useEffect(() => {
     document.documentElement.classList.add('dark');
@@ -76,6 +76,11 @@ const Flashcards = () => {
               </Button>
             ))}
           </div>
+          {selectedFile && (
+            <p className="mt-2 text-sm text-gray-400">
+              Selected file contains {questionCount} questions.
+            </p>
+          )}
         </div>
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
@@ -86,6 +91,7 @@ const Flashcards = () => {
               value={cardsPerSet}
               onChange={(e) => setCardsPerSet(parseInt(e.target.value, 10))}
               min="1"
+              max={questionCount}
               className="w-20 bg-gray-800 text-white"
             />
           </div>
