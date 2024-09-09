@@ -22,7 +22,7 @@ const FlashcardTable = ({ flashcards, setFlashcards }) => {
   };
 
   const exportCSV = () => {
-    const csvContent = flashcards.map(card => `${card.question},${card.answer}`).join('\n');
+    const csvContent = flashcards.map(card => `${card.question},${card.answer},${card.isMissed}`).join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     if (link.download !== undefined) {
