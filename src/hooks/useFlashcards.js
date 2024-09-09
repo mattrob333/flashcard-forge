@@ -29,13 +29,13 @@ export const useFlashcards = () => {
       let cards = lines
         .filter(line => line.trim() !== '')
         .map((line, index) => {
-          const lastCommaIndex = line.lastIndexOf(',');
-          if (lastCommaIndex === -1) {
+          const parts = line.split(',');
+          if (parts.length < 2) {
             console.warn(`Invalid line in CSV: ${line}`);
             return null;
           }
-          const question = line.slice(0, lastCommaIndex).trim();
-          const answer = line.slice(lastCommaIndex + 1).trim();
+          const question = parts[0].trim();
+          const answer = parts.slice(1).join(',').trim();
           
           if (!question || !answer) {
             console.warn(`Invalid line in CSV: ${line}`);
