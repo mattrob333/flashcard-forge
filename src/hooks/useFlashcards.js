@@ -35,7 +35,7 @@ export const useFlashcards = () => {
             console.warn(`Invalid line in CSV: ${line}`);
             return null;
           }
-          return { id: index, question: question.trim(), answer, isDifficult: false };
+          return { id: index, question: question.trim(), answer, isMissed: false };
         })
         .filter(card => card !== null);
 
@@ -60,10 +60,10 @@ export const useFlashcards = () => {
     reader.readAsText(selectedFile);
   };
 
-  const toggleDifficult = () => {
+  const toggleMissed = () => {
     setFlashcards(cards =>
       cards.map((card, index) =>
-        index === currentCardIndex ? { ...card, isDifficult: !card.isDifficult } : card
+        index === currentCardIndex ? { ...card, isMissed: !card.isMissed } : card
       )
     );
   };
@@ -80,7 +80,7 @@ export const useFlashcards = () => {
     randomize,
     setRandomize,
     handleGenerateFlashcards,
-    toggleDifficult,
+    toggleMissed,
     getCurrentCard
   };
 };

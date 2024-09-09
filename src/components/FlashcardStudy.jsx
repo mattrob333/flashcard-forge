@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 
-const FlashcardStudy = ({ currentCard, showAnswer, toggleAnswer, toggleDifficult, handlePrevCard, handleNextCard, currentIndex, totalCards, reviewingDifficult }) => {
+const FlashcardStudy = ({ currentCard, showAnswer, toggleAnswer, toggleMissed, handlePrevCard, handleNextCard, currentIndex, totalCards, reviewingMissed }) => {
   if (!currentCard) {
     return <p className="text-xl">No cards available</p>;
   }
@@ -13,7 +13,7 @@ const FlashcardStudy = ({ currentCard, showAnswer, toggleAnswer, toggleDifficult
     <Card className="w-full max-w-md mx-auto p-6 bg-gray-800 text-white">
       <div className="text-center mb-4">
         <span className="text-sm text-gray-400">
-          {reviewingDifficult ? "Reviewing Difficult Cards" : "All Cards"}
+          {reviewingMissed ? "Reviewing Missed Cards" : "All Cards"}
         </span>
         <br />
         <span className="text-sm text-gray-400">
@@ -33,11 +33,11 @@ const FlashcardStudy = ({ currentCard, showAnswer, toggleAnswer, toggleDifficult
         </Button>
         <div className="flex items-center">
           <Checkbox
-            id="difficultCard"
-            checked={currentCard.isDifficult}
-            onCheckedChange={toggleDifficult}
+            id="missedCard"
+            checked={currentCard.isMissed}
+            onCheckedChange={toggleMissed}
           />
-          <label htmlFor="difficultCard" className="ml-2 text-sm">Mark as difficult</label>
+          <label htmlFor="missedCard" className="ml-2 text-sm">Mark as missed</label>
         </div>
         <Button onClick={handleNextCard} variant="outline" className="border-gray-600">
           Next

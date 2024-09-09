@@ -12,9 +12,9 @@ import { useFileUpload } from '../hooks/useFileUpload';
 
 const Flashcards = () => {
   const [showTable, setShowTable] = useState(false);
-  const [reviewingDifficult, setReviewingDifficult] = useState(false);
+  const [reviewingMissed, setReviewingMissed] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
-  const { flashcards, setFlashcards, currentCardIndex, setCurrentCardIndex, cardsPerSet, setCardsPerSet, randomize, setRandomize, handleGenerateFlashcards, toggleDifficult, getCurrentCard } = useFlashcards();
+  const { flashcards, setFlashcards, currentCardIndex, setCurrentCardIndex, cardsPerSet, setCardsPerSet, randomize, setRandomize, handleGenerateFlashcards, toggleMissed, getCurrentCard } = useFlashcards();
   const { uploadedFiles, selectedFile, setSelectedFile, handleFileUpload, handleFileSelect } = useFileUpload();
 
   useEffect(() => {
@@ -23,13 +23,13 @@ const Flashcards = () => {
 
   const toggleTableView = () => setShowTable(!showTable);
 
-  const toggleReviewDifficult = () => {
-    const difficultCards = flashcards.filter(card => card.isDifficult);
-    if (difficultCards.length === 0) {
-      toast.error("No difficult cards to review.");
+  const toggleReviewMissed = () => {
+    const missedCards = flashcards.filter(card => card.isMissed);
+    if (missedCards.length === 0) {
+      toast.error("No missed cards to review.");
       return;
     }
-    setReviewingDifficult(!reviewingDifficult);
+    setReviewingMissed(!reviewingMissed);
     setCurrentCardIndex(0);
     setShowAnswer(false);
   };
@@ -43,13 +43,13 @@ const Flashcards = () => {
   };
 
   const handleNextCard = () => {
-    const cards = reviewingDifficult ? flashcards.filter(card => card.isDifficult) : flashcards;
+    const cards = reviewingMissed ? flashcards.filter(card => card.isMissed) : flashcards;
     setCurrentCardIndex((prevIndex) => (prevIndex + 1) % cards.length);
     setShowAnswer(false);
   };
 
   const handlePrevCard = () => {
-    const cards = reviewingDifficult ? flashcards.filter(card => card.isDifficult) : flashcards;
+    const cards = reviewingMissed ? flashcards.filter(card => card.isMissed) : flashcards;
     setCurrentCardIndex((prevIndex) => (prevIndex - 1 + cards.length) % cards.length);
     setShowAnswer(false);
   };
@@ -115,8 +115,8 @@ const Flashcards = () => {
             <Button onClick={toggleTableView}>
               {showTable ? "Hide Table View" : "Show Table View"}
             </Button>
-            <Button onClick={toggleReviewDifficult} variant={reviewingDifficult ? "default" : "outline"}>
-              {reviewingDifficult ? "Exit Difficult Review" : "Review Difficult"}
+            <Button onClick={toggleReviewMissed} variant={reviewingMissed ? "default" : "outline"}>
+              {reviewingMissed ? "Exit Missed Review" : "Review Missed"}
             </Button>
           </div>
           {showTable ? (
@@ -126,12 +126,12 @@ const Flashcards = () => {
               currentCard={getCurrentCard()}
               showAnswer={showAnswer}
               toggleAnswer={toggleAnswer}
-              toggleDifficult={toggleDifficult}
+              toggleMissed={toggleMissed}
               handlePrevCard={handlePrevCard}
               handleNextCard={handleNextCard}
               currentIndex={currentCardIndex}
-              totalCards={reviewingDifficult ? flashcards.filter(card => card.isDifficult).length : flashcards.length}
-              reviewingDifficult={reviewingDifficult}
+              totalCards={reviewingMissed ? flashcards.filter(card => card.isMissed).length : flashcards.length}
+              reviewingMissed={reviewingMissed}
             />
           )}
         </>
