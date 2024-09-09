@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { toast } from "sonner";
 
 export const useFlashcards = () => {
@@ -6,6 +6,7 @@ export const useFlashcards = () => {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [cardsPerSet, setCardsPerSet] = useState(10);
   const [randomize, setRandomize] = useState(false);
+  const [reviewingMissed, setReviewingMissed] = useState(false);
 
   const shuffleArray = (array) => {
     for (let i = array.length - 1; i > 0; i--) {
@@ -52,6 +53,7 @@ export const useFlashcards = () => {
 
       setFlashcards(cards);
       setCurrentCardIndex(0);
+      setReviewingMissed(false);
       toast.success(`Generated ${cards.length} flashcards.`);
     };
     reader.onerror = (error) => {
@@ -60,15 +62,38 @@ export const useFlashcards = () => {
     reader.readAsText(selectedFile);
   };
 
-  const toggleMissed = () => {
+  const toggleMissed = useCallback((cardId) => {
     setFlashcards(cards =>
-      cards.map((card, index) =>
-        index === currentCardIndex ? { ...card, isMissed: !card.isMissed } : card
+      cards.map(card =>
+        card.id === cardId ? { ...card, isMissed: !card.isMissed } : card
       )
     );
-  };
+  }, []);
 
-  const getCurrentCard = () => flashcards[currentCardIndex] || null;
+  const getCurrentCard = useCallback(() => {
+    const currentCards = reviewingMissed ? flashcards.filter(card => card.isMissed) : flashcards;
+    return currentCards[currentCardIndex] || null;
+  }, [flashcards, currentCardIndex, reviewingMissed]);
+
+  const handleNextCard = useCallback(() => {
+    const currentCards = reviewingMissed ? flashcards.filter(card => card.isMissed) : flashcards;
+    setCurrentCardIndex((prevIndex) => (prevIndex + 1) % currentCards.length);
+  }, [flashcards, reviewingMissed]);
+
+  const handlePrevCard = useCallback(() => {
+    const currentCards = reviewingMissed ? flashcards.filter(card => card.isMissed) : flashcards;
+    setCurrentCardIndex((prevIndex) => (prevIndex - 1 + currentCards.length) % currentCards.length);
+  }, [flashcards, reviewingMissed]);
+
+  const toggleReviewMissed = useCallback(() => {
+    const missedCards = flashcards.filter(card => card.isMissed);
+    if (missedCards.length === 0) {
+      toast.error("No missed cards to review.");
+      return;
+    }
+    setReviewingMissed(prev => !prev);
+    setCurrentCardIndex(0);
+  }, [flashcards]);
 
   return {
     flashcards,
@@ -79,8 +104,12 @@ export const useFlashcards = () => {
     setCardsPerSet,
     randomize,
     setRandomize,
+    reviewingMissed,
     handleGenerateFlashcards,
     toggleMissed,
-    getCurrentCard
+    getCurrentCard,
+    handleNextCard,
+    handlePrevCard,
+    toggleReviewMissed
   };
 };

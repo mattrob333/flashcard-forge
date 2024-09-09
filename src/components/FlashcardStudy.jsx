@@ -35,7 +35,7 @@ const FlashcardStudy = ({ currentCard, showAnswer, toggleAnswer, toggleMissed, h
           <Checkbox
             id="missedCard"
             checked={currentCard.isMissed}
-            onCheckedChange={toggleMissed}
+            onCheckedChange={() => toggleMissed(currentCard.id)}
           />
           <label htmlFor="missedCard" className="ml-2 text-sm">Mark as missed</label>
         </div>

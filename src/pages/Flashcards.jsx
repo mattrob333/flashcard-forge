@@ -12,9 +12,23 @@ import { useFileUpload } from '../hooks/useFileUpload';
 
 const Flashcards = () => {
   const [showTable, setShowTable] = useState(false);
-  const [reviewingMissed, setReviewingMissed] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
-  const { flashcards, setFlashcards, currentCardIndex, setCurrentCardIndex, cardsPerSet, setCardsPerSet, randomize, setRandomize, handleGenerateFlashcards, toggleMissed, getCurrentCard } = useFlashcards();
+  const { 
+    flashcards, 
+    setFlashcards, 
+    currentCardIndex, 
+    cardsPerSet, 
+    setCardsPerSet, 
+    randomize, 
+    setRandomize, 
+    reviewingMissed,
+    handleGenerateFlashcards, 
+    toggleMissed, 
+    getCurrentCard,
+    handleNextCard,
+    handlePrevCard,
+    toggleReviewMissed
+  } = useFlashcards();
   const { uploadedFiles, selectedFile, setSelectedFile, handleFileUpload, handleFileSelect } = useFileUpload();
 
   useEffect(() => {
@@ -23,35 +37,12 @@ const Flashcards = () => {
 
   const toggleTableView = () => setShowTable(!showTable);
 
-  const toggleReviewMissed = () => {
-    const missedCards = flashcards.filter(card => card.isMissed);
-    if (missedCards.length === 0) {
-      toast.error("No missed cards to review.");
-      return;
-    }
-    setReviewingMissed(!reviewingMissed);
-    setCurrentCardIndex(0);
-    setShowAnswer(false);
-  };
-
   const handleGenerateClick = () => {
     if (selectedFile) {
       handleGenerateFlashcards(selectedFile);
     } else {
       toast.error("Please select a file before generating flashcards.");
     }
-  };
-
-  const handleNextCard = () => {
-    const cards = reviewingMissed ? flashcards.filter(card => card.isMissed) : flashcards;
-    setCurrentCardIndex((prevIndex) => (prevIndex + 1) % cards.length);
-    setShowAnswer(false);
-  };
-
-  const handlePrevCard = () => {
-    const cards = reviewingMissed ? flashcards.filter(card => card.isMissed) : flashcards;
-    setCurrentCardIndex((prevIndex) => (prevIndex - 1 + cards.length) % cards.length);
-    setShowAnswer(false);
   };
 
   const toggleAnswer = () => {

@@ -45,13 +45,13 @@ const FlashcardTable = ({ flashcards, setFlashcards }) => {
             <TableRow>
               <TableHead>Question</TableHead>
               <TableHead>Answer</TableHead>
-              <TableHead>Difficult</TableHead>
+              <TableHead>Missed</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {flashcards.map((card, index) => (
-              <TableRow key={index}>
+              <TableRow key={card.id}>
                 <TableCell>
                   {editingIndex === index ? (
                     <Input
@@ -76,8 +76,8 @@ const FlashcardTable = ({ flashcards, setFlashcards }) => {
                 </TableCell>
                 <TableCell>
                   <Checkbox
-                    checked={card.isDifficult}
-                    onCheckedChange={(checked) => handleChange(index, 'isDifficult', checked)}
+                    checked={card.isMissed}
+                    onCheckedChange={(checked) => handleChange(index, 'isMissed', checked)}
                   />
                 </TableCell>
                 <TableCell>
