@@ -16,6 +16,23 @@ export const useFlashcards = () => {
     return array;
   };
 
+  const parseCSVLine = (line) => {
+    const result = [];
+    let startIndex = 0;
+    let inQuotes = false;
+
+    for (let i = 0; i < line.length; i++) {
+      if (line[i] === '"') {
+        inQuotes = !inQuotes;
+      } else if (line[i] === ',' && !inQuotes) {
+        result.push(line.slice(startIndex, i).replace(/^"|"$/g, '').trim());
+        startIndex = i + 1;
+      }
+    }
+    result.push(line.slice(startIndex).replace(/^"|"$/g, '').trim());
+    return result;
+  };
+
   const handleGenerateFlashcards = (selectedFile) => {
     if (!selectedFile || !(selectedFile instanceof File)) {
       toast.error("Please select a valid file to study.");
@@ -29,7 +46,7 @@ export const useFlashcards = () => {
       let cards = lines
         .filter(line => line.trim() !== '')
         .map((line, index) => {
-          const [question, answer] = line.split(',').map(part => part.trim());
+          const [question, answer] = parseCSVLine(line);
           if (!question || !answer) {
             console.warn(`Invalid line in CSV: ${line}`);
             return null;
