@@ -135,6 +135,7 @@ const Flashcards = () => {
               <FlashcardStudy
                 currentCard={getCurrentCard()}
                 showAnswer={showAnswer}
+                setShowAnswer={setShowAnswer}
                 toggleAnswer={toggleAnswer}
                 toggleMissed={toggleMissed}
                 handlePrevCard={handlePrevCard}

@@ -4,10 +4,20 @@ import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 
-const FlashcardStudy = ({ currentCard, showAnswer, toggleAnswer, toggleMissed, handlePrevCard, handleNextCard, currentIndex, totalCards, reviewingMissed }) => {
+const FlashcardStudy = ({ currentCard, showAnswer, setShowAnswer, toggleAnswer, toggleMissed, handlePrevCard, handleNextCard, currentIndex, totalCards, reviewingMissed }) => {
   if (!currentCard) {
     return <p className="text-xl">No cards available</p>;
   }
+
+  const handleNext = () => {
+    handleNextCard();
+    setShowAnswer(false);
+  };
+
+  const handlePrev = () => {
+    handlePrevCard();
+    setShowAnswer(false);
+  };
 
   return (
     <Card className="w-full max-w-md mx-auto p-6 bg-gray-800 text-white">
@@ -27,7 +37,7 @@ const FlashcardStudy = ({ currentCard, showAnswer, toggleAnswer, toggleMissed, h
         {showAnswer ? 'Show Question' : 'Show Answer'}
       </Button>
       <div className="flex items-center justify-between mt-4">
-        <Button onClick={handlePrevCard} variant="outline" className="border-gray-600">
+        <Button onClick={handlePrev} variant="outline" className="border-gray-600">
           <ChevronLeftIcon className="h-4 w-4 mr-2" />
           Previous
         </Button>
@@ -39,7 +49,7 @@ const FlashcardStudy = ({ currentCard, showAnswer, toggleAnswer, toggleMissed, h
           />
           <label htmlFor="missedCard" className="ml-2 text-sm">Mark as missed</label>
         </div>
-        <Button onClick={handleNextCard} variant="outline" className="border-gray-600">
+        <Button onClick={handleNext} variant="outline" className="border-gray-600">
           Next
           <ChevronRightIcon className="h-4 w-4 ml-2" />
         </Button>
